@@ -13,8 +13,9 @@ var reservaSchema = new Schema({
         ref: 'Pressupost',
         required: [true, 'El id presusupost esun campo obligatorio ']
     },
-    data_inicial: { type: String, required: [true, 'El nombre es necesario'] },
-    data_final: { type: String, required: [true, 'El nombre es necesario'] },
+    data_inicial: { type: Date, required: [true, 'El nombre es necesario'] },
+    data_final: { type: Date, required: [true, 'El nombre es necesario'] },
+    estat: { type: String, required: true }
 
 }, { collection: 'reserves' });
 

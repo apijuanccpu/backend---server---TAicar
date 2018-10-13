@@ -1,4 +1,5 @@
 var express = require('express');
+var moment = require('moment');
 
 var mdAutenticacion = require('../middlewares/autenticacion');
 
@@ -14,7 +15,9 @@ app.get('/', (req, res, next) => {
     var desde = req.query.desde || 0;
     desde = Number(desde);
 
-    Reserva.find({})
+    Reserva.find({
+            'estat': 'vigent'
+        })
         .skip(desde)
         .limit(5)
         .populate('vehicle')
@@ -81,69 +84,6 @@ app.get('/:id', (req, res) => {
 });
 
 // ==========================================
-// Actualizar Medico
-// ==========================================
-// app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
-
-//     var id = req.params.id;
-//     var body = req.body;
-
-//     Vehicle.findById(id, (err, vehicle) => {
-
-
-//         if (err) {
-//             return res.status(500).json({
-//                 ok: false,
-//                 mensaje: 'Error al buscar vehicle',
-//                 errors: err
-//             });
-//         }
-
-//         if (!vehicle) {
-//             return res.status(400).json({
-//                 ok: false,
-//                 mensaje: 'El vehicle con el id ' + id + ' no existe',
-//                 errors: { message: 'No existe un medico con ese ID' }
-//             });
-//         }
-
-
-//         vehicle.marca = body.marca;
-//         vehicle.model = body.model;
-//         vehicle.data_adquisicio = body.data_adquisicio;
-//         vehicle.matricula = body.matricula;
-//         vehicle.places = body.places;
-//         vehicle.classificacio = body.classificacio;
-//         vehicle.observacions = body.observacions;
-//         vehicle.temporada_extra = body.temporada_extra;
-//         vehicle.temporada_alta = body.temporada_alta;
-//         vehicle.temporada_mitja = body.temporada_mitja;
-//         vehicle.temporada_baixa = body.temporada_baixa;
-
-//         vehicle.save((err, vehicleGuardat) => {
-
-//             if (err) {
-//                 return res.status(400).json({
-//                     ok: false,
-//                     mensaje: 'Error al actualizar veh',
-//                     errors: err
-//                 });
-//             }
-
-//             res.status(200).json({
-//                 ok: true,
-//                 vehicle: vehicleGuardat
-//             });
-
-//         });
-
-//     });
-
-// });
-
-
-
-// ==========================================
 // Crear una nova reserva
 // ==========================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {
@@ -152,9 +92,10 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
     var reserva = new Reserva({
         vehicle: body.vehicle,
-        pressupost: body.id_pressupost,
+        pressupost: body.pressupost,
         data_inicial: body.data_inicial,
-        data_final: body.data_final
+        data_final: body.data_final,
+        estat: 'vigent'
 
     });
 
@@ -307,12 +248,13 @@ app.get('/consultasireservaperdata/:idvehicle/:data', mdAutenticacion.verificaTo
     //var regex = new RegExp(busqueda, 'i');
 
     Reserva.find({
-        $and: [{ data_inicial: { $lte: data } }, { data_final: { $gte: data } }, { 'vehicle': idvehicle }]
+        $and: [{ data_inicial: { $lte: data } }, { data_final: { $gte: data } }, { "vehicle": idvehicle }]
 
     })
 
 
     .populate('pressupost')
+        .populate('vehicle')
         .exec((err, reserves) => {
 
             if (err) {
@@ -333,89 +275,41 @@ app.get('/consultasireservaperdata/:idvehicle/:data', mdAutenticacion.verificaTo
 
 });
 
-app.get('/consultaperdatafi/:idvehicle/:datafi', mdAutenticacion.verificaToken, (req, res) => {
+app.get('/consultasireservaperdata2/:idvehicle/:data/:datafi', mdAutenticacion.verificaToken, (req, res) => {
 
     var idvehicle = req.params.idvehicle;
+    var data = req.params.data;
     var datafi = req.params.datafi;
-    // var datafi = req.params.datafi;
 
+    let date_1 = moment(data);
+    let date_2 = moment(datafi);
+    var dates = [];
 
+    for (let _i = date_1; _i <= date_2; _i.add(1, 'days')) {
+        dates.push(_i.format('YYYY-MM-DD'));
+    }
 
+    console.log(dates);
 
     var tabla = req.params.quinadata;
     //var regex = new RegExp(busqueda, 'i');
 
     Reserva.find({
-        $and: [{ data_inicial: { $lte: datafi } }, { data_final: { $gte: datafi } }, { 'vehicle': idvehicle }]
 
+
+
+        // "$or": [{
+        data_inicial: { $lte: { $in: ['2018-09-24', '2018-09-24', '2018-09-24', '2018-09-24'] } },
+        data_final: { $gte: { $in: ['2018-09-24', '2018-09-24', '2018-09-24', '2018-09-24'] } },
+        "vehicle": idvehicle
+            // }]
     })
 
 
 
-    .exec((err, reserves1) => {
-
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                mensaje: 'Error al buscar reserves',
-                errors: err
-            });
-        }
-
-        reserves1.find({
-            $and: [{ data_inicial: { $lte: datafi } }, { data_final: { $gte: datafi } }, { 'vehicle': idvehicle }]
-
-        });
-
-
-        res.status(200).json({
-            ok: true,
-            reserves: reserves,
-            total: reserves.length
-        });
-    });
-
-
-});
-
-app.get('/consultasireservaavehicle/:idvehicle/:datainici/:datafi', mdAutenticacion.verificaToken, (req, res) => {
-
-    var idvehicle = req.params.idvehicle;
-    var datainici = req.params.datainici;
-    var datafi = req.params.datafi;
-    var tabla = req.params.quinadata;
-    //var regex = new RegExp(busqueda, 'i');
-
-    Reserva.find({
-        $and: [{ data_inicial: { $lte: datainici } }, { data_final: { $gte: datainici } }, { 'vehicle': idvehicle }]
-
-    })
-
-
-
-    .exec((err, reserves1) => {
-
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                mensaje: 'Error al buscar reserves',
-                errors: err
-            });
-        }
-        if (!reserves1) {
-            return res.status(500).json({
-                ok: false,
-                mensaje: 'No reserves data inici',
-                errors: err
-            });
-        }
-
-        reserves1.find({
-            $and: [{ data_inicial: { $lte: datafi } }, { data_final: { $gte: datafi } }, { 'vehicle': idvehicle }]
-
-        })
-
-        .exec((err, reserves2) => {
+    .populate('pressupost')
+        .populate('vehicle')
+        .exec((err, reserves) => {
 
             if (err) {
                 return res.status(500).json({
@@ -427,15 +321,88 @@ app.get('/consultasireservaavehicle/:idvehicle/:datainici/:datafi', mdAutenticac
 
             res.status(200).json({
                 ok: true,
-                reserves: reserves2,
+                reserves: reserves,
                 total: reserves.length
             });
+        });
 
+
+});
+
+app.get('/consultaperpressupost/:idpressupost', mdAutenticacion.verificaToken, (req, res) => {
+
+    var idpressupost = req.params.idpressupost;
+
+    Reserva.find({
+        "pressupost": idpressupost
+    })
+
+
+
+    .populate('pressupost')
+        .populate('vehicle')
+        .exec((err, reserves) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar reserves',
+                    errors: err
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                reserves: reserves,
+                total: reserves.length
+            });
+        });
+
+
+});
+
+// ==========================================
+// Actualizar perpressupost
+// ==========================================
+app.get('/actualitzaperpressupost/:idpressupost/:estat', mdAutenticacion.verificaToken, (req, res) => {
+    var pressupost = req.params.idpressupost;
+    var vestat = req.params.estat;
+
+    Reserva.updateMany({
+
+            "pressupost": pressupost
+
+        }, {
+            $set: {
+                estat: vestat
+
+            }
+        },
+        (err, reserves) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error borrar medico',
+                    errors: err
+                });
+            }
+
+            if (!reserves) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'No existe un booking con ese id',
+                    errors: { message: 'No existe un booking con ese id' }
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                reserves: reserves
+            });
 
         });
 
-    });
-});
 
+});
 
 module.exports = app;

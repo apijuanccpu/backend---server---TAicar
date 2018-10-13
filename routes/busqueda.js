@@ -49,6 +49,9 @@ app.get('/coleccion/:tabla/:busqueda', (req, res) => {
         case 'reserves':
             promesa = buscarReserves(busqueda, regex);
             break;
+        case 'factures':
+            promesa = buscarFactures(busqueda, regex);
+            break;
 
         default:
             return res.status(400).json({
@@ -89,7 +92,8 @@ app.get('/todo/:busqueda', (req, res, next) => {
             buscarClients(busqueda, regex),
             buscarVehicles(busqueda, regex),
             buscarPressupostos(busqueda, regex),
-            buscarReserves(busqueda, regex)
+            buscarReserves(busqueda, regex),
+            buscarFactres(busqueda, regex)
         ])
         .then(respuestas => {
 
@@ -222,6 +226,28 @@ function buscarPressupostos(busqueda, regex) {
                     reject('Error al cargar pressupostos', err);
                 } else {
                     resolve(pressupostos);
+                }
+            });
+
+
+    });
+}
+
+function buscarFactures(busqueda, regex) {
+
+    return new Promise((resolve, reject) => {
+
+        Factura.find({
+
+            })
+            .or([{ 'data': regex }])
+            .populate('client')
+            .exec((err, factures) => {
+
+                if (err) {
+                    reject('Error al cargar factures', err);
+                } else {
+                    resolve(factures);
                 }
             });
 

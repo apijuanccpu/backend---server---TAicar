@@ -37,6 +37,8 @@ var vehiclesRoutes = require('./routes/vehicle');
 var pressupostosRoutes = require('./routes/pressupost');
 var pressupostosdetallRoutes = require('./routes/pressupostdetall');
 var reservesRoutes = require('./routes/reserva');
+var bookingRoutes = require('./routes/booking');
+var facturaRoutes = require('./routes/factura');
 
 
 // Conexión a la base de datos
@@ -69,6 +71,8 @@ app.use('/vehicle', vehiclesRoutes);
 app.use('/pressupost', pressupostosRoutes);
 app.use('/pressupostdetall', pressupostosdetallRoutes);
 app.use('/reserva', reservesRoutes);
+app.use('/booking', bookingRoutes);
+app.use('/factura', facturaRoutes);
 
 
 app.use('/', appRoutes);

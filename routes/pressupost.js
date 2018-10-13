@@ -149,6 +149,164 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 });
 
 // ===================
+// Anular
+// =========================
+app.get('/anular/:id', mdAutenticacion.verificaToken, (req, res) => {
+
+    var id = req.params.id;
+    var body = req.body;
+
+    Pressupost.findById(id, (err, pressupost) => {
+
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'El persona no existe',
+                errors: err
+            });
+        }
+        if (!pressupost) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'El persona con el id' + id + ' no existe',
+                errors: { message: 'No existe persona con ese dni' }
+            });
+        }
+
+        // pressupost.num = body.num;
+        // pressupost.data = body.data;
+        // pressupost.data_vigencia = body.data_vigencia;
+        // pressupost.client = body.client;
+        // pressupost.preu_brut = body.preu_brut;
+        // pressupost.preu_net = body.preu_net;
+        // pressupost.observacions = body.observacions;
+        // pressupost.estat = body.estat;
+        pressupost.estat = 'anulat';
+
+
+        pressupost.save((err, pressupostGuardat) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'ERror al actualizar pressupost',
+                    errors: err
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                pressupost: pressupostGuardat
+            });
+        });
+
+
+    });
+
+
+
+});
+
+// ===================
+// Confirmar
+// =========================
+app.get('/confirmar/:id', mdAutenticacion.verificaToken, (req, res) => {
+
+    var id = req.params.id;
+    var body = req.body;
+
+    Pressupost.findById(id, (err, pressupost) => {
+
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'El persona no existe',
+                errors: err
+            });
+        }
+        if (!pressupost) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'El persona con el id' + id + ' no existe',
+                errors: { message: 'No existe persona con ese dni' }
+            });
+        }
+
+        pressupost.estat = 'confirmat';
+        pressupost.save((err, pressupostGuardat) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'ERror al actualizar pressupost',
+                    errors: err
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                pressupost: pressupostGuardat
+            });
+        });
+
+
+    });
+
+
+
+});
+
+// ===================
+// Facturar
+// =========================
+app.get('/facturar/:id', mdAutenticacion.verificaToken, (req, res) => {
+
+    var id = req.params.id;
+    var body = req.body;
+
+    Pressupost.findById(id, (err, pressupost) => {
+
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'El persona no existe',
+                errors: err
+            });
+        }
+        if (!pressupost) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'El persona con el id' + id + ' no existe',
+                errors: { message: 'No existe persona con ese dni' }
+            });
+        }
+
+        pressupost.estat = 'facturat';
+        pressupost.save((err, pressupostGuardat) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'ERror al actualizar pressupost',
+                    errors: err
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                pressupost: pressupostGuardat
+            });
+        });
+
+
+    });
+
+
+
+});
+
+
+// ===================
 //Crear nuevo usuario
 // =========================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {
@@ -306,6 +464,41 @@ app.get('/:id', (req, res) => {
                 pressupost: pressupost
             });
         });
+});
+
+// ==========================================
+// Obtener pressupost vigents i data
+// ==========================================
+app.get('/obtenirnotificacionspressupost/:data', mdAutenticacion.verificaToken, (req, res) => {
+
+    //var pressupost = req.params.idpressupost;
+    var fecha = req.params.data;
+
+    Pressupost.find({
+        $and: [{ data_vigencia: { $lte: fecha } }, { "estat": 'vigent' }]
+
+    })
+
+    .exec(
+        (err, pressupostos) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando bookings',
+                    errors: err
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                pressupostos: pressupostos
+            });
+
+
+
+        });
+
+
 });
 
 

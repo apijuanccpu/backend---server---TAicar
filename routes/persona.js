@@ -30,7 +30,7 @@ app.get('/', (req, res, next) => {
 
     Persona.find({})
         .skip(desde)
-        // .limit()
+        .limit(10)
         .exec(
 
             (err, persones) => {
@@ -54,12 +54,43 @@ app.get('/', (req, res, next) => {
 
             });
 
+});
+
+// ===================
+//Obtener totes les PErsoness
+// =========================
+
+app.get('/search', (req, res, next) => {
+
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    Persona.find({})
+        .select("_id nombre")
+        .skip(desde)
+        // .limit()
+        .exec(
+
+            (err, personessearch) => {
+                if (err) {
+                    res.status(500).json({
+                        ok: false,
+                        mensaje: 'ERror cargando persona',
+                        errors: err
+                    });
+                }
+
+                Persona.count({}, (err, conteo) => {
+
+                    res.status(200).json({
+                        ok: true,
+                        personessearch: personessearch,
+                        total: conteo
+                    });
+                });
 
 
-
-
-
-
+            });
 
 });
 

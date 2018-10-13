@@ -105,7 +105,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
             });
         }
 
-
+        vehicle.nom = body.nom;
         vehicle.marca = body.marca;
         vehicle.model = body.model;
         vehicle.data_adquisicio = body.data_adquisicio;
@@ -149,6 +149,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
     var body = req.body;
 
     var vehicle = new Vehicle({
+        nom: body.nom,
         marca: body.marca,
         model: body.model,
         data_adquisicio: body.data_adquisicio,

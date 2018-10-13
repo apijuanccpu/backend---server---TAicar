@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 
 var vehicleSchema = new Schema({
+    nom: { type: String, required: [true, 'El nombre es necesario'] },
     marca: { type: String, required: [true, 'El nombre es necesario'] },
     model: { type: String, required: [true, 'El nombre es necesario'] },
     matricula: { type: String, required: [true, 'El nombre es necesario'] },
