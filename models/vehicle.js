@@ -11,6 +11,7 @@ var vehicleSchema = new Schema({
     places: { type: Number, required: [true, 'El nombre es necesario'] },
     classificacio: { type: String, required: [true, 'El nombre es necesario'] },
     observacions: { type: String, required: false },
+    color: { type: String, required: false },
     img: { type: String, required: false },
     temporada_extra: { type: Number, required: false },
     temporada_alta: { type: Number, required: false },

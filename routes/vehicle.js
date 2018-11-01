@@ -113,6 +113,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         vehicle.places = body.places;
         vehicle.classificacio = body.classificacio;
         vehicle.observacions = body.observacions;
+        vehicle.color = body.color;
         vehicle.temporada_extra = body.temporada_extra;
         vehicle.temporada_alta = body.temporada_alta;
         vehicle.temporada_mitja = body.temporada_mitja;
@@ -157,6 +158,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         places: body.places,
         classificacio: body.classificacio,
         observacions: body.observacions,
+        color: body.color,
         temporada_extra: body.temporada_extra,
         temporada_alta: body.temporada_alta,
         temporada_mitja: body.temporada_mitja,

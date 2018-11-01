@@ -16,7 +16,8 @@ app.get('/', (req, res, next) => {
     desde = Number(desde);
 
     Reserva.find({
-            'estat': 'vigent'
+            $or: [{ "estat": 'vigent' }, { "estat": 'confirmada' }]
+                // 'estat': 'vigent'
         })
         .skip(desde)
         .limit(5)
@@ -356,6 +357,162 @@ app.get('/consultaperpressupost/:idpressupost', mdAutenticacion.verificaToken, (
                 reserves: reserves,
                 total: reserves.length
             });
+        });
+
+
+});
+
+// ==========================================
+// Anular Reserva
+// ==========================================
+app.get('/anular/:idpressupost', mdAutenticacion.verificaToken, (req, res) => {
+
+    var pressupost = req.params.idpressupost;
+
+    Reserva.findOne({
+            $and: [{ "pressupost": pressupost }]
+
+        })
+        .exec((err, reservaFind) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error borrar medico',
+                    errors: err
+                });
+            }
+
+            if (!reservaFind) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'No existe un booking con ese id',
+                    errors: { message: 'No existe un booking con ese id' }
+                });
+            }
+
+            reservaFind.estat = 'anulada';
+
+            reservaFind.save((err, reservaGuardada) => {
+
+                if (err) {
+                    return res.status(400).json({
+                        ok: false,
+                        mensaje: 'Error al actualizar booking',
+                        errors: err
+                    });
+                }
+
+                res.status(200).json({
+                    ok: true,
+                    reserva: reservaGuardada
+                });
+
+            });
+
+        });
+
+
+});
+
+// ==========================================
+// Confirmar Reserva
+// ==========================================
+app.get('/confirmar/:idpressupost', mdAutenticacion.verificaToken, (req, res) => {
+
+    var pressupost = req.params.idpressupost;
+
+    Reserva.findOne({
+            $and: [{ "pressupost": pressupost }]
+
+        })
+        .exec((err, reservaFind) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error borrar medico',
+                    errors: err
+                });
+            }
+
+            if (!reservaFind) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'No existe un booking con ese id',
+                    errors: { message: 'No existe un booking con ese id' }
+                });
+            }
+
+            reservaFind.estat = 'confirmada';
+
+            reservaFind.save((err, reservaGuardada) => {
+
+                if (err) {
+                    return res.status(400).json({
+                        ok: false,
+                        mensaje: 'Error al actualizar booking',
+                        errors: err
+                    });
+                }
+
+                res.status(200).json({
+                    ok: true,
+                    reserva: reservaGuardada
+                });
+
+            });
+
+        });
+
+
+});
+
+// ==========================================
+// Facturar Reserva
+// ==========================================
+app.get('/facturar/:idpressupost', mdAutenticacion.verificaToken, (req, res) => {
+
+    var pressupost = req.params.idpressupost;
+
+    Reserva.findOne({
+            $and: [{ "pressupost": pressupost }]
+
+        })
+        .exec((err, reservaFind) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error borrar medico',
+                    errors: err
+                });
+            }
+
+            if (!reservaFind) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'No existe un booking con ese id',
+                    errors: { message: 'No existe un booking con ese id' }
+                });
+            }
+
+            reservaFind.estat = 'facturada';
+
+            reservaFind.save((err, reservaGuardada) => {
+
+                if (err) {
+                    return res.status(400).json({
+                        ok: false,
+                        mensaje: 'Error al actualizar booking',
+                        errors: err
+                    });
+                }
+
+                res.status(200).json({
+                    ok: true,
+                    reserva: reservaGuardada
+                });
+
+            });
+
         });
 
 

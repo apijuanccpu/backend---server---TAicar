@@ -501,6 +501,45 @@ app.get('/obtenirnotificacionspressupost/:data', mdAutenticacion.verificaToken, 
 
 });
 
+// ==========================================
+// Obtener booking entre dates
+// ==========================================
+app.get('/caduquensegonsvigencia/:datavigencia', mdAutenticacion.verificaToken, (req, res) => {
+
+    var vigencia = req.params.datavigencia;
+
+
+    Pressupost.find({
+        $and: [{ data_vigencia: { $gte: vigencia } }]
+
+    })
+
+    .exec(
+        (err, pressupostos) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando pressupostos',
+                    errors: err
+                });
+            }
+            Pressupost.count({
+                $and: [{ data_vigencia: { $gte: vigencia } }]
+
+            }, (err, conteo) => {
+
+                res.status(200).json({
+                    ok: true,
+                    pressupostos: pressupostos,
+                    total: conteo
+                });
+
+            });
+
+        });
+});
+
 
 
 module.exports = app;

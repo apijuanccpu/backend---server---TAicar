@@ -50,6 +50,38 @@ app.get('/', (req, res, next) => {
 });
 
 // ===================
+// Obtener factura porid
+// =========================
+app.get('/:id', (req, res) => {
+
+    var id = req.params.id;
+
+    Factura.findById(id)
+        .populate('client')
+        .exec((err, factura) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar pressupost',
+                    errors: err
+                });
+            }
+            if (!factura) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El factura con el id ' + id + ' no existe',
+                    errors: { message: 'No existe un pressupost con ese id' }
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                factura: factura
+            });
+        });
+});
+
+// ===================
 // Actualizar
 // =========================
 app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
@@ -117,7 +149,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
     var factura = new Factura({
         num: body.num,
         data: body.data,
-        data_pagament: body.data_pagament,
+        data_pagament: body.data,
         // viatgers: body.viatgers
         // vehicle: body.vehicle,
         client: body.client,

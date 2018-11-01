@@ -121,7 +121,8 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         vehicle: body.vehicle,
         temporada: body.temporada,
         dies: body.dies,
-        preu: body.preu
+        preu: body.preu,
+        id_factura: body.id_factura
 
     });
     pressupostdetall.save((err, pressupostdetallGuardat) => {
@@ -176,6 +177,43 @@ app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
         });
 
     });
+});
+
+// ===================
+// Borrar pressupost
+// =========================
+app.delete('/perpressupost/:id', mdAutenticacion.verificaToken, (req, res) => {
+
+    var id = req.params.id;
+
+    PressupostDetall.deleteMany({
+        'id_pressupost': id
+    })
+
+    .exec(
+        (err2, pressupostos_detall_borrats) => {
+
+            if (err2) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al borrar el pressupost',
+                    errors: err
+                });
+            }
+            if (!pressupostos_detall_borrats) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'No existe pressupost_detall con ese id de pressupost',
+                    errors: { message: 'No existe pressupost_detall con ese id de pressupost' }
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                pressupostos_detall_borrats: pressupostos_detall_borrats
+            });
+
+        });
 });
 
 // ===================
@@ -245,35 +283,47 @@ app.get('/perpressupost/:num', (req, res) => {
 });
 
 // ===================
-// Borrar pressupostosdetall por num_pressupost
+// Actualitza factura pressupostosdetall por num_pressupost
 // =========================
-app.delete('/perpressupost/:num', mdAutenticacion.verificaToken, (req, res) => {
+app.get('/actualitzafactura_perpressupost/:num/:idfactura', (req, res) => {
 
     var num = req.params.num;
+    var factura = req.params.idfactura;
 
-    PressupostDetall.deleteMany({
-            'id_pressupost': num
-        })
-        .exec((err, pressupostosdetallEsborrats) => {
+    PressupostDetall.updateMany({
 
+
+            "id_pressupost": num
+
+
+        }, {
+            $set: {
+
+                "id_factura": factura
+            }
+        },
+        (err, pressupostos) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
-                    mensaje: 'Error al buscar pressupost',
+                    mensaje: 'Error borrar medico',
                     errors: err
                 });
             }
-            if (!pressupostosdetallEsborrats) {
+
+            if (!pressupostos) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'El pressupost con el id ' + id + ' no existe',
-                    errors: { message: 'No existe un pressupost con ese id' }
+                    mensaje: 'No existe un booking con ese id',
+                    errors: { message: 'No existe un booking con ese id' }
                 });
             }
+
             res.status(200).json({
                 ok: true,
-                pressupostos_detall: pressupostosdetallEsborrats
+                pressupostos: pressupostos
             });
+
         });
 });
 

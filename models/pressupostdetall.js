@@ -10,6 +10,11 @@ var pressupostdetallSchema = new Schema({
         ref: 'Pressupost',
         required: [true, 'El id vehicle esun campo obligatorio ']
     },
+    id_factura: {
+        type: Schema.Types.ObjectId,
+        ref: 'Factura',
+        required: [false]
+    },
     data_inicial: { type: String, required: [true, 'El	data	es	necesario'] },
     data_final: { type: String, required: [true, 'El	data	es	necesario'] },
     viatgers: { type: Number, required: false },

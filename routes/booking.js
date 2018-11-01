@@ -157,6 +157,47 @@ app.get('/obtenirbookingperiode/:idvehicle/:datainici/:datafi/:disponible', mdAu
 });
 
 // ==========================================
+// Obtener booking entre dates sense especificar el coche
+// ==========================================
+app.get('/obtenirbookingperiodesensecoche/:datainici/:datafi/:disponible', mdAutenticacion.verificaToken, (req, res) => {
+
+    var idvehicle = req.params.idvehicle;
+    var fecha1 = req.params.datainici;
+    var fecha2 = req.params.datafi;
+    var vdisponible = req.params.disponible;
+
+    Booking.find({
+        $and: [{ data: { $lte: fecha2 } }, { data: { $gte: fecha1 } }, { "disponible": vdisponible }]
+
+    })
+
+    .exec(
+        (err, bookings) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando bookings',
+                    errors: err
+                });
+            }
+            Booking.count({
+                $and: [{ data: { $lte: fecha2 } }, { data: { $gte: fecha1 } }, { "disponible": vdisponible }]
+
+            }, (err, conteo) => {
+
+                res.status(200).json({
+                    ok: true,
+                    bookings: bookings,
+                    total: conteo
+                });
+
+            });
+
+        });
+});
+
+// ==========================================
 // Actualizar Booking
 // ==========================================
 app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
@@ -441,7 +482,62 @@ app.put('/actualitzarbooking/:idvehicle/:data/:disponible', mdAutenticacion.veri
 // ==========================================
 // Actualizar una data bookings
 // ==========================================
-app.put('/actualitzarperiodebooking/:idvehicle/:datainici/:datafi/:disponible', mdAutenticacion.verificaToken, (req, res) => {
+app.put('/put_actualitzarperiodebooking/:idvehicle/:datainici/:datafi/:disponible', mdAutenticacion.verificaToken, (req, res) => {
+    var idvehicle = req.params.idvehicle;
+    var fecha1 = req.params.datainici;
+    var fecha2 = req.params.datafi;
+    var vdisponible = req.params.disponible;
+
+    var body = req.body;
+
+    var pressupost = body._id;
+    console.log('419' + body);
+    console.log('420' + pressupost);
+
+
+    Booking.updateMany({
+
+            data: { $lte: fecha2, $gte: fecha1 },
+            "vehicle": idvehicle
+
+
+        }, {
+            $set: {
+                disponible: vdisponible,
+                "pressupost": pressupost
+            }
+        },
+        (err, bookings) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error borrar medico',
+                    errors: err
+                });
+            }
+
+            if (!bookings) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'No existe un booking con ese id',
+                    errors: { message: 'No existe un booking con ese id' }
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                booking: bookings
+            });
+
+        });
+
+
+});
+
+// ==========================================
+// Actualizar una data bookings
+// ==========================================
+app.get('/actualitzarperiodebooking/:idvehicle/:datainici/:datafi/:disponible', mdAutenticacion.verificaToken, (req, res) => {
     var idvehicle = req.params.idvehicle;
     var fecha1 = req.params.datainici;
     var fecha2 = req.params.datafi;
